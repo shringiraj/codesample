@@ -1,0 +1,37 @@
+
+    public function actionLoginCheck(){
+        $data = [
+            'response'=>true
+        ];
+        if(Yii::$app->session->get("loginCheckTime") < time() || Yii::$app->user->isGuest){
+            $data['response'] = false;
+            Yii::$app->user->logout();
+        }
+        return json_encode($data);
+        
+    }
+
+
+
+
+
+<?php
+if (!Yii::$app->user->isGuest) {
+    Yii::$app->session->set("loginCheckTime", time() + 30 * 60);
+}
+?>
+
+<script type="text/javascript">
+    var loginCheckUrl = "<?= Url::to(['/site/login-check']) ?>";
+    $(document).ready(function () {
+        setInterval(function () {
+            $.post(loginCheckUrl, {}, function (data) {
+//                alert(data)
+                obj = JSON.parse(data);
+                if (!obj.response) {
+                    location = "<?= Url::to(['/']) ?>";
+                }
+            });
+        }, 5000);
+    });
+</script>

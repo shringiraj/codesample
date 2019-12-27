@@ -1,0 +1,32 @@
+<?= Html::button('Add Breakdown', ['class' => 'btn btn-danger btn-sm updateCode']) ?>
+<?php
+$formUrl = Url::to(['update']);
+$script = <<< JS
+    $("body").on('click', '.updateCode',function(e) {
+        id = $(this).data("id");
+        $("#updateCodeModalContent").load("$formUrl?id="+id);
+        $('#updateCodeModal').modal('show');
+    });
+JS;
+$this->registerJs($script);
+echo $this->render("@frontend/views/layouts/_ajaxRenderModal", [
+    'heading' => "Update Code",
+    'modalId' => "updateCodeModal",
+    'contentId' => "updateCodeModalContent",
+]);
+?>
+
+
+
+<script type="text/javascript">
+
+    $('.chosen').chosen({width: "100%"});
+    $("input").attr("autocomplete", "off");
+    $('.dp-block-future').datepicker({
+        autoclose: true,
+        format: 'dd-mm-yyyy',
+        endDate: '+0d',
+        todayBtn: true,
+        todayHighlight: true,
+    });
+</script>

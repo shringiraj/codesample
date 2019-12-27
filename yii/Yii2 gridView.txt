@@ -1,0 +1,20 @@
+
+GridView::widget([
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    'tableOptions'=>['class'=>''],//for table tag
+    'rowOptions' => ['class' => ""], //for tr
+    'columns' => [
+        [
+            'class' => 'yii\grid\SerialColumn',
+            "headerOptions" => ['width' => 60],
+        ],
+        [
+            "attribute" => "state_id",
+            'format' => 'raw',
+            "headerOptions" => ['class' => "text-center", 'width' => 60,], //for header td
+            "contentOptions" => ['class' => "text-center"], //for content td
+            "value" => "state_name",
+        ],
+    ],
+]);

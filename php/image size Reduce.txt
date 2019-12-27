@@ -1,0 +1,31 @@
+
+//image size Reduce
+
+
+        $src = Yii::getAlias("@backend/web/theme/pawel-czerwinski-dgJT71cXlC4-unsplash.jpg");
+        $dest = Yii::getAlias("@backend/web/theme/thumb-" . time() . ".jpg");
+        
+        
+        list($width,$height) = getimagesize($src);
+        
+        $newWidth = 800;
+        if($width > $newWidth){
+            $ratio = $newWidth / $width ;
+            $newHeight = $height * $ratio;
+        }else{
+            $newWidth = $width;
+            $newHeight = $height;
+        }
+        Image::thumbnail($src, $newWidth, $newHeight)->save($dest);
+        echo "W:".$width ." H:".$height;
+        echo "<br>";
+        echo "W:".$newWidth ." H:".$newHeight;
+        
+        echo "<pre>";
+        print_r(getimagesize($src));
+        echo "</pre>";
+        
+        
+        
+        //Image::frame($src, 0, '666', 0)->save($dest, ['jpeg_quality' => 2]);
+    

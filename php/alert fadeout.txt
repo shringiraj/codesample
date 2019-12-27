@@ -1,0 +1,8 @@
+setTimeout(function () {
+    $('.flssucc').fadeOut('fast');
+}, 8000);
+
+setTimeout(function () {
+    $('.flserr').fadeOut('fast');
+}, 8000);
+

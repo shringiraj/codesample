@@ -1,0 +1,13 @@
+
+        [
+            'class' => 'yii\grid\ActionColumn',
+            'header' => 'Action',
+            'headerOptions' => ['style' => 'width: 100px;'],
+            'contentOptions' => ['style' => 'width: 100px;'],
+            'template' => '{update} {delete}',
+            'buttons' => [
+                'update' => function ($url) {
+                    return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, ['title' => 'Edit']);
+                },
+            ],
+        ],

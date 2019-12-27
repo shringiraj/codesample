@@ -1,0 +1,25 @@
+
+[
+	'attribute'=>'location',
+        'value' =>'locationName.location',
+],
+
+public function getLocationName(){
+    return $this->hasOne(MasterLocation::className(), ['id' => 'location_id']); 
+}
+
+
+>>>locationSearch >>> search function 
+	1. define 
+		> public $location;
+
+	2. add 'location' in rules
+
+	3. join with above function name
+		> $query = Employer::find()->joinWith('locationName');
+
+	4. in "ActiveDataProvider"
+		'sort'=>['attributes'=>['location']] 
+
+	5. add >andFilterWhere method in query
+		->andFilterWhere(['like', 'location', $this->mob1])

@@ -1,0 +1,23 @@
+6:44 PM 22-Aug-18
+
+>>>required components
+> npm ( install)
+> vsCode (install ide)
+> npm install -g angular-cli ( only first time )
+> npm install -g typescript  ( for typescript  )
+
+>>>creating project in xampp/htdocs
+cmd in htdocs>ng new projectName
+
+>>>change path to project folder [xampp/htdocs/projectName]
+cmd>cd projectName
+
+>>>To start angular server
+cmd>ng serve
+
+>>>To creaate component
+ng generate component componentName
+ng g c componentName
+ng g c componentName --it or [inline-template] ( inlineTemplate )
+ng g c componentName --is or [inline-style]( inlineStyle)
+ng g c componentName --flat ( for ignoring folder )

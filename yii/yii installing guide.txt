@@ -1,0 +1,129 @@
+Updated on
+11:50 AM 08-Aug-18
+
+=================Yii Installing Guide===============
+
+1. Download Yii and extract in xampp
+2. cmd>composer update 
+3. cmd>php init
+4. create datebase
+5. remane datebase name in common>conig>main-local.php
+6. cmd>yii migrate
+7. copy paste .htacces and change folder name (code below in this doc.)
+
+8. uncomment UrlManager from frontend|backend>config>main.php
+9. add this array  in config
+	--->frontend
+	'request'=>[
+	    'class' => 'common\components\Request',
+	    'web'=> '/frontend/web'
+	],
+	--->backend
+        'request'=>[
+	    'class' => 'common\components\Request',
+	    'web'=> '/backend/web',
+            'adminUrl'=>'/admin',
+	],
+10. create request class in [common\components\](code below in this doc.)	
+
+=================================================================Gii
+>>> gii ko dusre pc me open karne ke liye main-loacal me
+>>> file name main-local for both frontend and backend
+    	
+	$config['bootstrap'][] = 'gii';
+    	$config['modules']['gii'] = [
+    	    'class' => 'yii\gii\Module',
+    	    'allowedIPs' => ['*'],		<-ye code dalte hai
+    	];
+
+
+=================================================================set time zone
+>>> Time Zone set karne ke liye
+
+	common>config>main.php
+
+	return 
+	    'timeZone' => 'Asia/Calcutta',
+
+
+
+
+
+==================================common\components\request
+<?php
+namespace common\components;
+use yii;
+
+class Request extends \yii\web\Request {
+    public $web;
+    public $adminUrl;
+
+    public function getBaseUrl(){
+        return str_replace($this->web, "", parent::getBaseUrl()) . $this->adminUrl;
+    }
+
+    public function resolvePathInfo(){
+        if($this->getUrl() === $this->adminUrl){
+            return "";
+        }else{
+            return parent::resolvePathInfo();
+        }
+    }
+    
+    
+    public function base_url($arg = null) {
+        //return "hello";
+        if ($arg == null)
+            return Yii::$app->request->baseUrl;
+        return Yii::$app->request->baseUrl."/" . $arg;
+    }
+    
+}
+?>
+
+
+
+
+
+
+
+
+
+========================================================htaccess
+============change folder name 
+
+Options +FollowSymlinks
+RewriteEngine On
+
+# deal with admin first
+RewriteCond %{REQUEST_URI} ^/mbm/(admin)
+RewriteRule ^admin/assets/(.*)$ backend/web/assets/$1 [L]
+RewriteRule ^admin/css/(.*)$ backend/web/css/$1 [L]
+RewriteRule ^admin/js/(.*)$ backend/web/js/$1 [L]
+RewriteRule ^admin/theme/(.*)$ backend/web/theme/$1 [L]
+RewriteRule ^admin/fonts/(.*)$ backend/web/fonts/$1 [L]
+RewriteRule ^admin/admin/(.*)$ backend/web/admin/$1 [L]
+RewriteRule ^admin/adminassets/(.*)$ backend/web/adminassets/$1 [L]
+
+RewriteCond %{REQUEST_URI} !^/mbm/backend/web/(assets|css|js|theme|admin|adminassets)/
+RewriteCond %{REQUEST_URI} ^/mbm/(admin)
+RewriteRule ^.*$ backend/web/index.php [L]
+
+#frontend
+RewriteCond %{REQUEST_URI} ^/mbm/(assets|css|theme|js|upload_doc)
+RewriteRule ^assets/(.*)$ frontend/web/assets/$1 [L]
+RewriteRule ^css/(.*)$ frontend/web/css/$1 [L]
+RewriteRule ^js/(.*)$ frontend/web/js/$1 [L]
+RewriteRule ^theme/(.*)$ frontend/web/theme/$1 [L]
+RewriteRule ^upload_doc/(.*)$ frontend/web/upload_doc/$1 [L]
+
+RewriteCond %{REQUEST_URI} !^/mbm/(frontend|backend)/web/(assets|css|js|theme|upload_doc)/
+RewriteCond %{REQUEST_URI} !index.php
+RewriteCond %{REQUEST_FILENAME} !-f [OR]
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^.*$ frontend/web/index.php
+
+
+
+
+

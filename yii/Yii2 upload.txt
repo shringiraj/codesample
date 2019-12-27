@@ -1,0 +1,17 @@
+
+public function functionName() {
+    //use yii\web\UploadedFile;
+
+    $image = UploadedFile::getInstance($model, 'image_path');
+    if ($image) {
+        $imageName = "machine_$model->id" . '.' . $image->extension;
+        $imagePath = Yii::getAlias("@f_document/machine/$imageName");
+        $image->saveAs($imagePath);
+        $model->image_path = $imageName;
+        $model->save();
+    }
+
+    if (is_file($imagePath)) {
+        unlink($imagePath);
+    }
+}

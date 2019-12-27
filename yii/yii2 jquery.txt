@@ -1,0 +1,11 @@
+<?php
+$script = <<< JS
+     
+        
+JS;
+$this->registerJs($script);
+?>
+
+
+
+            'sort' => ['defaultOrder' => ['id' => SORT_DESC]],

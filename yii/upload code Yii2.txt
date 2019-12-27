@@ -1,0 +1,13 @@
+//upload image
+
+$image = UploadedFile::getInstancesByName("upload_doc"); 
+if(!empty($image)){
+    $image = $image[0];
+    if(!empty($image) ){
+        $uid = uniqid(time(), true);
+        $data['upload_doc'] = 'purchasedoc_'.$uid.'.'.$image->getExtension();
+        $image->saveAs(Yii::getAlias('@frontend/web/machinepurchasedoc').'/'.$data['upload_doc']);
+    }else{
+        $data['upload_doc'] = "";
+    }
+}

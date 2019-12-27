@@ -1,0 +1,15 @@
+
+$transaction = Yii::$app->db->beginTransaction();
+try {
+    $flag = true;
+
+
+    if ($flag) {
+        $transaction->commit();
+        Yii::$app->session->setFlash("success", "Your data successfully Saved.");
+        return $this->redirect(['index']);
+    }
+} catch (\Exception $e) {
+    $transaction->rollBack();
+    Yii::$app->session->setFlash("error", "Something went wrong..!");
+}

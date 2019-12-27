@@ -1,0 +1,16 @@
+	
+	try {
+           // $this->loadModel($id)->delete();
+            $this->findModel($id)->delete();
+            Yii::$app->session->setFlash('error', "Material Type deleted Successfully..!!");
+             return $this->redirect(['index']);
+        } catch (\yii\db\IntegrityException $e) {
+            if ($e->errorInfo[1] == 1451) {
+                header("HTTP/1.0 400 Relation Restriction");
+                Yii::$app->session->setFlash('error', $name." cannot be deleted.\n");
+                //echo "it cannot be deleted.\n";
+                return $this->redirect(['index']);
+            } else {
+                throw $e;
+            }
+        }

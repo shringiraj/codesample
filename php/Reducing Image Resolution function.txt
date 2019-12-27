@@ -1,0 +1,43 @@
+
+<div class="">
+    <?php
+
+    
+function img_thumb($image = "1.jpg",$new_width = 400,$new_height = null){
+    $imgPath = Yii::getAlias("@frontend/web/images/".$image);
+    list($width, $height) = $attr = getimagesize($imgPath);
+    $factor = $width/$new_width;
+    $new_height = ($new_height === null)?$height/$factor:$new_height;
+    //print_r($attr);
+    
+    $path_info = pathinfo($image);
+    $extension = $path_info['extension'];
+    
+    $new_img = time().".".$extension;
+    $new_img_path = Yii::getAlias("@frontend/web/images/temp/".$new_img);
+    
+    $t = imagecreatefromjpeg($imgPath);
+    $s = imagecreatetruecolor($new_width, $new_height);
+    $x = imagesx($t);
+    $y = imagesy($t);
+    imagecopyresampled($s, $t, 0, 0, 0, 0, $new_width, $new_height, $x, $y);
+    imagejpeg($s, $new_img_path);
+    chmod($new_img_path, 777);
+    return $new_img;
+}
+
+$new_img = img_thumb();
+    ?>
+
+<picture>
+  <source media="(min-width: 650px)" srcset="<?= Url::to(['/images/1.jpg']) ?>">
+  <source media="(min-width: 465px)" srcset="<?= Url::to(['/images/temp/'.$new_img]) ?>">
+  <img src="<?= Url::to(['/images/temp/'.$new_img]) ?>" alt="Flowers" style="width:auto;">
+</picture>
+    
+    <img src="<?= Url::to(['/images/1.jpg']) ?>" class="img-responsive"/>
+    <img src="<?= Url::to(['/images/temp/'.$new_img]) ?>" class="img-responsive"/>
+    <img src="<?= Url::to(['/images/temp/'.$new_img]) ?>" class="img-responsive" width="100%"/>
+
+</div>
+

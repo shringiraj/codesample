@@ -1,0 +1,22 @@
+
+    public function timeAgo($dateYMD){
+        
+        $date1=date_create($dateYMD);
+        $date2=date_create(date("Y-m-d"));
+        $diff=date_diff($date1,$date2);
+
+        if($diff->y){
+            $ago = $diff->y." year ago";
+        }elseif($diff->m){
+            $ago = $diff->m." month ago";
+        }elseif($diff->d){
+            $ago = $diff->d." day ago";
+        }elseif($diff->h){
+            $ago = $diff->h." hour ago";
+        }elseif($diff->i){
+            $ago = $diff->i." minutes ago";
+        }elseif($diff->s){
+            $ago = $diff->s." seconds ago";
+        }
+        return $ago;
+    }

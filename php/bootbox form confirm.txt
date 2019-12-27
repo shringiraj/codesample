@@ -1,0 +1,39 @@
+<?php $form = ActiveForm::begin(["enableAjaxValidation" => true, "options" => ['class' => "form-submit", "data-confirm-msg" => 'Are you sure to submit']]); ?>
+
+
+//javascript
+
+
+var submitCheck = false;
+$(".form-submit").on("beforeSubmit", function () {
+    var form = $(this);
+    var msg = form.attr("data-confirm-msg");
+    if (submitCheck == false) {
+        bootbox.hideAll();
+        bootbox.dialog({
+            message: msg,
+            buttons: {
+
+                ok: {
+                    label: "Confirm",
+                    className: 'btn-info alert-btn-focus',
+                    focus: true,
+                    callback: function () {
+                        submitCheck = true;
+                        form.submit();
+                    }
+                },
+                cancel: {
+                    label: "Cancel",
+                    className: 'btn-danger',
+                    callback: function () {
+                        submitCheck = false;
+                    }
+                }
+            }
+        });
+        return false;
+    }
+});
+
+
