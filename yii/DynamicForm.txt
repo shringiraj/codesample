@@ -1,0 +1,215 @@
+<?php
+
+use yii\helpers\Url;
+use wbraganca\dynamicform\DynamicFormWidget;
+use frontend\modules\store\models\Item;
+
+/* @var $this yii\web\View */
+/* @var $ItemUniqueModel frontend\modules\store\models\ItemUnique */
+/* @var $form yii\widgets\ActiveForm */
+?>
+
+<?php
+DynamicFormWidget::begin([
+    'widgetContainer' => 'dynamicform_wrapper', // required: only alphanumeric characters plus "_" [A-Za-z0-9_]
+    'widgetBody' => '.container-items', // required: css class selector
+    'widgetItem' => '.item', // required: css class
+//    'limit' => , // the maximum times, an element can be cloned (default 999)
+    'min' => false, // 0 or 1 (default 1)
+    'insertButton' => '.add-item', // css class
+    'deleteButton' => '.remove-item', // css class
+    'model' => $DieselMiscModels[0], // count($DieselMiscModels) > 0 ? reset($DieselMiscModels) : new frontend\modules\diesel\models\DieselMisc,
+    'formId' => 'form-generate-diesel',
+    'formFields' => [
+        'remark',
+        'quantity',
+    ],
+]);
+?>
+<div class="grid-view">
+    <table class="table table-bordered  table-striped table-addmore" >
+        <thead>
+            <tr>
+                <th width="60">SN.</th>
+                <th class='text-center'>Remark</th>
+                <th class='text-center' width="200">Quantity</th>
+                <th width="20"><button type="button" tabindex="-1" class="add-item btn chosenUpdate btn-success btn-xs"><i class="glyphicon glyphicon-plus"></i></button></th>
+            </tr>
+        </thead>
+        <tbody class="container-items">
+            <?php $sn = 1 ?>
+            <?php foreach ($DieselMiscModels as $index => $DieselMiscModel): ?>
+                <tr class="item">
+                    <td class="text-center sn" style="vertical-align: middle"><?= $index + 1 ?>
+                        <?= $form->field($DieselMiscModel, "[$index]id")->hiddenInput()->label(false) ?>
+                    </td>
+                    <td><?= $form->field($DieselMiscModel, "[$index]remark")->textarea()->label(false) ?></td>
+                    <td><?= $form->field($DieselMiscModels[$index], "[$index]quantity")->textInput(['class' => 'form-control allow_decimal text-right'])->label(false) ?></td>
+                    <td style="vertical-align: middle"><button type="button" tabindex="-1" class="remove-item btn  btn-danger btn-xs"><i class="glyphicon glyphicon-minus"></i></button></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
+<?php DynamicFormWidget::end(); ?>
+
+
+<?php
+$script = <<< JS
+    $(".dynamicform_wrapper").on("afterInsert , afterDelete", function(e, item) {
+        $('.container-items tr').each(function(index){
+            $(this).find(".sn").text( index+1 );
+        });
+    });
+        
+JS;
+$this->registerJs($script);
+?>
+        
+
+
+
+
+
+
+public function actionCreate() {
+   UserAccess::CurrentActionNotFound('create');
+
+   $model = new EarthReceiving();
+   $EarthReceivingDetailModels = [new EarthReceivingDetail];
+   if ($model->load(Yii::$app->request->post())) {
+       $postData = Yii::$app->request->post();
+
+       $EarthReceivingDetailModels = Model::createMultiple(EarthReceivingDetail::class);
+       Model::loadMultiple($EarthReceivingDetailModels, $postData);
+       if (Yii::$app->request->isAjax) {
+           Yii::$app->response->format = Response::FORMAT_JSON;
+           $return = ActiveForm::validate($model);
+           $return = ArrayHelper::merge(ActiveForm::validateMultiple($EarthReceivingDetailModels), $return);
+           return $return;
+       }
+
+
+
+       $model->receiving_date = TimeHelper::DateFilter($model->receiving_date);
+       $model->c_at = $this->createdAt;
+       $model->c_by = $this->userId;
+
+
+
+       $transaction = Yii::$app->db->beginTransaction();
+       try {
+           $flag = true;
+
+           if ($model->save()) {
+               foreach ($EarthReceivingDetailModels as $EarthReceivingDetailModel) {
+
+                   $EarthReceivingDetailModel->earth_receiving_id = $model->id;
+                   $EarthReceivingDetailModel->c_at = $this->createdAt;
+                   $EarthReceivingDetailModel->c_by = $this->userId;
+
+                   if (!$EarthReceivingDetailModel->save()) {
+                       $flag = false;
+                   }
+               }
+           } else {
+               $flag = false;
+           }
+
+           if ($flag) {
+               $transaction->commit();
+               Yii::$app->session->setFlash("success", "Your data successfully Saved.");
+               return $this->redirect(['view', 'id' => Encryption::Encrypt($model->id)]);
+           }
+       } catch (\Exception $e) {
+           $transaction->rollBack();
+           Yii::$app->session->setFlash("error", "Something went wrong..!");
+       }
+   }
+
+   return $this->render('create', [
+               'model' => $model,
+               'EarthReceivingDetailModels' => $EarthReceivingDetailModels,
+   ]);
+}
+
+public function actionUpdate($id) {
+   UserAccess::CurrentActionNotFound('update');
+   $id = Encryption::Decrypt($id);
+   $model = $this->findModel($id);
+
+
+   $EarthReceivingDetailModels = $model->details;
+
+   if ($model->load(Yii::$app->request->post())) {
+       $postData = Yii::$app->request->post();
+
+
+
+       $OldIDs = ArrayHelper::map($EarthReceivingDetailModels, 'id', 'id');
+       $EarthReceivingDetailModels = Model::createMultiple(EarthReceivingDetail::class, $EarthReceivingDetailModels);
+       Model::loadMultiple($EarthReceivingDetailModels, $postData);
+       $DeletedIDs = array_diff($OldIDs, array_filter(ArrayHelper::map($EarthReceivingDetailModels, 'id', 'id')));
+
+
+
+
+       if (Yii::$app->request->isAjax) {
+           Yii::$app->response->format = Response::FORMAT_JSON;
+           $return = ActiveForm::validate($model);
+           $return = ArrayHelper::merge(ActiveForm::validateMultiple($EarthReceivingDetailModels), $return);
+           return $return;
+       }
+
+
+
+       $model->receiving_date = TimeHelper::DateFilter($model->receiving_date);
+       $model->u_at = $this->createdAt;
+       $model->u_by = $this->userId;
+
+
+
+       $transaction = Yii::$app->db->beginTransaction();
+       try {
+           $flag = true;
+           if (!empty($DeletedIDs)) {
+               EarthReceivingDetail::deleteAll(['id' => $DeletedIDs]);
+           }
+
+           if ($model->save()) {
+               foreach ($EarthReceivingDetailModels as $EarthReceivingDetailModel) {
+                   if ($EarthReceivingDetailModel->isNewRecord) {
+                       $EarthReceivingDetailModel->earth_receiving_id = $model->id;
+                       $EarthReceivingDetailModel->c_at = $this->createdAt;
+                       $EarthReceivingDetailModel->c_by = $this->userId;
+                   } else {
+
+                       $EarthReceivingDetailModel->u_at = $this->createdAt;
+                       $EarthReceivingDetailModel->u_by = $this->userId;
+                   }
+
+                   if (!$EarthReceivingDetailModel->save()) {
+                       $flag = false;
+                   }
+               }
+           } else {
+               $flag = false;
+           }
+
+           if ($flag) {
+               $transaction->commit();
+               Yii::$app->session->setFlash("success", "Your data successfully Saved.");
+               return $this->redirect(['view', 'id' => Encryption::Encrypt($model->id)]);
+           }
+       } catch (\Exception $e) {
+           $transaction->rollBack();
+           Yii::$app->session->setFlash("error", "Something went wrong..!");
+       }
+   }
+
+   $model->receiving_date = TimeHelper::DMY($model->receiving_date);
+   return $this->render('update', [
+               'model' => $model,
+               'EarthReceivingDetailModels' => $EarthReceivingDetailModels,
+   ]);
+}

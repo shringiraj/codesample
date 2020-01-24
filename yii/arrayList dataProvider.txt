@@ -1,0 +1,18 @@
+
+<?php
+$data = [
+    ['id' => 1, 'name' => 'name 1',],
+    ['id' => 2, 'name' => 'name 2',],
+    ['id' => 100, 'name' => 'name 100',],
+];
+
+$provider = new ArrayDataProvider([
+    'allModels' => $data,
+    'pagination' => [
+        'pageSize' => 10,
+    ],
+    'sort' => [
+        'attributes' => ['id', 'name'],
+    ],
+]);
+?>
