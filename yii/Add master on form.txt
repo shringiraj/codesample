@@ -1,0 +1,95 @@
+
+<div class="col-md-4">
+    <?=
+    $form->field($model, 'unit_id')->dropDownList(Unit::DList(), [
+        "prompt" => " -- select -- ",
+        "class" => "form-control chosen",
+        "id" => "unit_id",
+    ])->mandatory(Html::a('Unit', ['/master/unit'], ['target' => '_blank']) . " <i class='fa fa-plus-circle add-unit'></i>");
+    ?>
+</div>
+
+
+//=================================================== In view page for ajax calling
+echo $this->render("@frontend/views/layouts/_ajaxShortcutForm", [
+    'heading' => "Add Unit",
+    'modalId' => "addUnitModal",
+    'contentId' => "addUnitModalContent",
+    'formUrl' => Url::to(['/master/unit/add-from-form']),
+    'clickOn' => '.add-unit',
+    'targetId' => 'unit_id',
+]);
+
+
+
+//=================================================== file _ajaxShortcutForm.php
+<?php
+
+/*
+ * Sample Code
+ *
+ * echo $this->render("@frontend/views/layouts/_ajaxShortcutForm", [
+ *     'heading' => "Add Brand",//model title
+ *     'modalId' => "addBrandModal", 
+ *     'contentId' => "addBrandModalContent",
+ *     'formUrl' => Url::to(['/store/brand/add-from-form']), 
+ *     'clickOn' => '.add-brand', //click to open modal form
+ *     'targetId' => 'brand_id', //result append in targetId 
+ * ]);
+ */
+$string = 'ModalId' . microtime(21) . rand();
+$string = implode("", explode('.', $string));
+
+$modalId = isset($modalId) ? $modalId : $string;
+$contentId = isset($contentId) ? $contentId : $string . "Content";
+echo $this->render("@frontend/views/layouts/_ajaxRenderModal", [
+    'heading' => $heading,
+    'modalId' => $modalId,
+    'contentId' => $contentId,
+]);
+//$formUrl = Url::to(['/master/unit/add-from-form']);
+$script = <<< JS
+    $('body').on('click','$clickOn',function(){
+        $("#$contentId").load("$formUrl?addOnForm=1&targetId=$targetId");
+        $('#$modalId').modal('show');
+    })
+JS;
+$this->registerJs($script);
+
+
+//=================================================== Controller > Action
+
+public function actionAddFromForm() {
+    UserAccess::CurrentActionNotFound("create");
+    $model = new Unit();
+    if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $model->c_at = $this->createdAt;
+        $model->c_by = $this->userId;
+        if (Yii::$app->request->get('ajaxSubmission')) {
+            if ($model->save()) {
+                return [
+                    'response' => true,
+                    'key' => $model->id,
+                    'value' => $model->unit_name,
+                ];
+            } else {
+                return [
+                    'response' => false,
+                ];
+            }
+        } else {
+            return ActiveForm::validate($model);
+        }
+    }
+    return $this->renderAjax('_form', [
+                'model' => $model,
+    ]);
+}
+
+//=================================================== some change in button in _form.php
+<?php if (Yii::$app->request->isAjax) { ?>
+    <?= Html::button('<i class="fa fa-close fa-fw"></i> Cancel', ['class' => 'btn btn-default', 'data-dismiss' => 'modal']) ?>
+<?php } else { ?>
+    <?= Html::a('<i class="fa fa-close fa-fw"></i> Cancel', ["index"], ['class' => 'btn btn-default']) ?>
+<?php } ?>
