@@ -82,14 +82,54 @@ public function actionAddFromForm() {
             return ActiveForm::validate($model);
         }
     }
-    return $this->renderAjax('_form', [
+    return $this->renderAjax('_ajaxForm', [
                 'model' => $model,
     ]);
 }
 
-//=================================================== some change in button in _form.php
-<?php if (Yii::$app->request->isAjax) { ?>
-    <?= Html::button('<i class="fa fa-close fa-fw"></i> Cancel', ['class' => 'btn btn-default', 'data-dismiss' => 'modal']) ?>
-<?php } else { ?>
-    <?= Html::a('<i class="fa fa-close fa-fw"></i> Cancel', ["index"], ['class' => 'btn btn-default']) ?>
-<?php } ?>
+//=================================================== change form accroding to your requirement in _ajaxForm.php
+<?php
+
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+
+/* @var $this yii\web\View */
+/* @var $model frontend\modules\master\models\Unit */
+/* @var $form yii\widgets\ActiveForm */
+?>
+
+<div class="unit-form">
+
+    <?php
+    $form = ActiveForm::begin([
+                'id' => 'form_unit',
+                'enableAjaxValidation' => true,
+                'enableClientValidation' => false,
+    ]);
+    ?>
+
+    <div class="row">
+        <div class="col-md-4"><?= $form->field($model, 'unit_name')->textInput(['maxlength' => true]) ?></div>        
+        <div class="col-md-4"><?= $form->field($model, 'unit_type')->dropDownList(Master::$unitType, ['maxlength' => true]) ?></div>        
+        <div class="col-md-4">
+            <div class="form-group">
+                <label>&nbsp;</label><br />
+                <?= Html::submitButton('<i class="fa fa-save fa-fw"></i> Save', ['class' => 'btn btn-success']) ?>
+                <?php if (Yii::$app->request->isAjax) { ?>
+                    <?= Html::button('<i class="fa fa-close fa-fw"></i> Cancel', ['class' => 'btn btn-default', 'data-dismiss' => 'modal']) ?>
+                <?php } else { ?>
+                    <?= Html::a('<i class="fa fa-close fa-fw"></i> Cancel', ["index"], ['class' => 'btn btn-default']) ?>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+    <?php ActiveForm::end(); ?>
+
+</div>
+
+<?php
+echo $this->render("@frontend/views/layouts/_ajaxShortcutFormJs", [
+    'formId' => "form_unit",
+]);
+?>
+
