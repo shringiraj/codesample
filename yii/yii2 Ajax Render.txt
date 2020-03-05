@@ -17,6 +17,14 @@ echo $this->render("@frontend/views/layouts/_ajaxRenderModal", [
 ?>
 
 
+<div class="form-group">                        
+    <?= Html::submitButton('<i class="fa fa-save fa-fw"></i> Save', ['class' => 'btn btn-success']) ?>
+    <?php if (Yii::$app->request->isAjax) { ?>
+        <?= Html::button('<i class="fa fa-close fa-fw"></i> Cancel', ['class' => 'btn btn-default', 'data-dismiss' => 'modal']) ?>
+    <?php } else { ?>
+        <?= Html::a('<i class="fa fa-close fa-fw"></i> Cancel', ["index"], ['class' => 'btn btn-default']) ?>
+    <?php } ?>
+</div>
 
 <script type="text/javascript">
 
